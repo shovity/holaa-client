@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const fs = require('node:fs/promises')
 const readline = require('node:readline')
 const io = require('socket.io-client')
@@ -29,10 +27,10 @@ const prompt = async (label, falback) => {
 
 const getUser = async () => {
     try {
-        return guser || (await fs.readFile('user')).toString()
+        return guser || (await fs.readFile('~/.holaa-user')).toString()
     } catch (error) {
         const user = await prompt('Enter username> ')
-        fs.writeFile('user', user)
+        fs.writeFile('~/.holaa-user', user)
         return user
     }
 }
