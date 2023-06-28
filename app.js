@@ -28,13 +28,21 @@ const prompt = async (label, falback) => {
 }
 
 const getUser = async () => {
-    try {
-        return guser || (await fs.readFile(path.join(os.homedir(), '.holaa-user'))).toString()
-    } catch (error) {
-        const user = await prompt('Enter username> ')
-        fs.writeFile(path.join(os.homedir(), '.holaa-user'), user)
-        return user
+    let user = guser
+
+    if (!user) {
+        try {
+            user = (await fs.readFile(path.join(os.homedir(), '.holaa-user'))).toString()
+        } catch (error) {
+            do {
+                user = await prompt('Enter username (/^[a-zA-Z0-9_-]{5,12}$/) > ')
+            } while (!/^[a-zA-Z0-9_-]{5,12}$/.test(user))
+
+            fs.writeFile(path.join(os.homedir(), '.holaa-user'), user)
+        }
     }
+
+    return user.padEnd(12, ' ')
 }
 
 const main = async () => {
@@ -43,9 +51,13 @@ const main = async () => {
     socket.emit('join', { user, channel })
 
     socket.on('message', (data) => {
+        process.stdout.write('\r\x1b[K')
+
         for (const { user, content } of data) {
             console.log(`${user}> ${content}`)
         }
+
+        rl.prompt()
     })
 
     while (true) {
