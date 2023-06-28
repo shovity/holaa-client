@@ -1,3 +1,5 @@
+const os = require('node:os')
+const path = require('node:path')
 const fs = require('node:fs/promises')
 const readline = require('node:readline')
 const io = require('socket.io-client')
@@ -27,10 +29,10 @@ const prompt = async (label, falback) => {
 
 const getUser = async () => {
     try {
-        return guser || (await fs.readFile('~/.holaa-user')).toString()
+        return guser || (await fs.readFile(path.join(os.homedir(), '.holaa-user'))).toString()
     } catch (error) {
         const user = await prompt('Enter username> ')
-        fs.writeFile('~/.holaa-user', user)
+        fs.writeFile(path.join(os.homedir(), '.holaa-user'), user)
         return user
     }
 }
